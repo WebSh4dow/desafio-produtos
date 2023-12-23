@@ -23,18 +23,15 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "usuarios_acesso",
-            uniqueConstraints =
-            @UniqueConstraint(columnNames = {"usuario_id", "acesso_id"}, name = "unique_acesso_user"),
-            joinColumns = @JoinColumn(name = "usuario_id",
-
-                    referencedColumnName = "id", table = "usuario", unique = false,
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "usuarios_acesso",
+            uniqueConstraints = @UniqueConstraint(columnNames = {"usuario_id", "acesso_id"}, name = "unique_acesso_user"),
+            joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false,
                     foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
-            inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false,
-
-                    referencedColumnName = "id", table = "acesso",
-                    foreignKey = @ForeignKey(name = "acesso_fk", value = ConstraintMode.CONSTRAINT)))
+            inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false, referencedColumnName = "id", table = "acesso",
+                    foreignKey = @ForeignKey(name = "acesso_fk", value = ConstraintMode.CONSTRAINT))
+    )
     private Set<Acesso> acessos = new HashSet<>();
 
     public Usuario(String login, String senha) {
@@ -110,5 +107,13 @@ public class Usuario implements UserDetails {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public void addAcesso(Acesso acesso) {
+        this.acessos.add(acesso);
+    }
+
+    public void removeAcesso(Acesso acesso) {
+        this.acessos.remove(acesso);
     }
 }

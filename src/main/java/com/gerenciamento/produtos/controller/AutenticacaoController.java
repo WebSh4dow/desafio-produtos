@@ -14,6 +14,7 @@ import com.gerenciamento.produtos.security.request.SignupRequest;
 import com.gerenciamento.produtos.security.request.TokenRefreshRequest;
 import com.gerenciamento.produtos.security.response.JwtResponse;
 import com.gerenciamento.produtos.security.response.TokenRefreshResponse;
+import com.gerenciamento.produtos.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,6 +45,9 @@ public class AutenticacaoController {
 
     @Autowired
     private AcessoRepository acessoRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -86,7 +90,7 @@ public class AutenticacaoController {
     @PostMapping("/signup")
     public ResponseEntity<?> registrarUsuario(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByLogin(signUpRequest.getLogin())) {
-            return ResponseEntity.badRequest().body(new BussinesException("Error: Usuário iatual ja possui um refresh Token!"));
+            return ResponseEntity.badRequest().body("Error Usuário iatual ja possui um refresh Token!");
         }
 
         Usuario usuario = new Usuario(signUpRequest.getLogin(),
@@ -97,32 +101,35 @@ public class AutenticacaoController {
 
         if (acessos == null) {
             Acesso acessoUsuario = acessoRepository.findByDescricao(ACESSO_NORMAL)
-                    .orElseThrow(() -> new RuntimeException("Error: Acesso Atual não existe no cadastro."));
+                    .orElseThrow(() -> new BussinesException("Error: Acesso Atual não existe no cadastro."));
             acessoUsuarioSet.add(acessoUsuario);
         } else {
             acessos.forEach(acessoCadastro -> {
                 if (ACESSO_ADMINISTRADOR.equals(acessoCadastro.toString())) {
                     Acesso acessoAdministrador = acessoRepository.findByDescricao(ACESSO_ADMINISTRADOR)
-                            .orElseThrow(() -> new RuntimeException("Error: Acesso Atual não existe no cadastro."));
+                            .orElseThrow(() -> new BussinesException("Error: Acesso Atual não existe no cadastro."));
                     acessoUsuarioSet.add(acessoAdministrador);
                 }
 
                 if (ACESSO_ESTOQUISTA.equals(acessoCadastro.toString())) {
                     Acesso AcessoEstoquista = acessoRepository.findByDescricao(ACESSO_ESTOQUISTA)
-                            .orElseThrow(() -> new RuntimeException("Erro: Acesso Atual não existe no cadastro."));
+                            .orElseThrow(() -> new BussinesException("Erro: Acesso Atual não existe no cadastro."));
                     acessoUsuarioSet.add(AcessoEstoquista);
                 } else {
                     Acesso acessoPadrao = acessoRepository.findByDescricao(ACESSO_NORMAL)
-                            .orElseThrow(() -> new RuntimeException("Erro:  Acesso Atual não existe no cadastro."));
+                            .orElseThrow(() -> new BussinesException("Erro:  Acesso Atual não existe no cadastro."));
                     acessoUsuarioSet.add(acessoPadrao);
                 }
             });
         }
 
-        usuario.setAcessos(acessoUsuarioSet);
-        userRepository.save(usuario);
+        usuarioService.consultarConstraintAndRemove();
 
-        return ResponseEntity.ok("Usuário registrado com sucesso!");
+        usuario.setAcessos(acessoUsuarioSet);
+
+        userRepository.saveAndFlush(usuario);
+
+        return ResponseEntity.ok("Usuario com o nome de " + signUpRequest.getLogin() + " Foi Cadastrado com sucesso!");
     }
 
     @PostMapping("/refreshtoken")
