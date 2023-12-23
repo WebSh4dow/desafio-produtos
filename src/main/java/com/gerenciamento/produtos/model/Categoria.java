@@ -21,6 +21,7 @@ public class Categoria implements Serializable {
     private String nome;
 
     private boolean ativo;
+
     @Enumerated(EnumType.STRING)
     private Tipo tipo;
 
