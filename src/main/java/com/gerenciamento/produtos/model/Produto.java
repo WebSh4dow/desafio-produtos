@@ -13,9 +13,11 @@ import java.util.Objects;
 public class Produto implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_produto")
     private Long id;
+
     @NotBlank(message = "O nome do produto é um campo obrigatório")
     private String nome;
 
