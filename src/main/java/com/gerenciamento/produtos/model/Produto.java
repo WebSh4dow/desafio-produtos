@@ -35,8 +35,7 @@ public class Produto implements Serializable {
 
     private Integer quantidadeEstoque;
 
-    @NotBlank(message = "O campo icms é um campo obrigatório")
-    private String icms;
+    private BigDecimal icms = BigDecimal.ZERO;;
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
@@ -108,11 +107,11 @@ public class Produto implements Serializable {
         this.quantidadeEstoque = quantidadeEstoque;
     }
 
-    public String getIcms() {
+    public BigDecimal getIcms() {
         return icms;
     }
 
-    public void setIcms(String icms) {
+    public void setIcms(BigDecimal icms) {
         this.icms = icms;
     }
 
