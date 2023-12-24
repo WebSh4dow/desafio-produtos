@@ -59,8 +59,8 @@ public class ProdutoService {
                 throw new BussinesException(PRODUTO_EXISTENTE);
             }
 
-            if (produtoRepository.existeProdutoNomeCadastrado(produto.getNome()) != null) {
-                throw new BussinesException(PRODUTO_EXISTENTE);
+            if (produtoRepository.existeSkuProdutoCadastrado(produto.getSku()) != null) {
+                throw new BussinesException(SKU_EXISTENTE);
             }
 
             if (produto.getQuantidadeEstoque() < 0) {
