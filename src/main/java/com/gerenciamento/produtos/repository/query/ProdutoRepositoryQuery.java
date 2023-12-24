@@ -32,6 +32,7 @@ public interface ProdutoRepositoryQuery {
                     "FROM Produto " +
                     "pr WHERE pr.nome = ?1";
 
+
     public static String CONSULTAR_PRODUTOS_ATIVOS =
             "SELECT * FROM Produto " +
                     "WHERE ativo = true";

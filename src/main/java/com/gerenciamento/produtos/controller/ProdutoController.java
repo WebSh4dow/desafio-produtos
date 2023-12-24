@@ -56,7 +56,7 @@ public class ProdutoController {
             logger.info("Cadastrando novo produto: {}", produto);
             return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.cadastrar(produto));
 
-        } catch (BussinesException e) {
+        } catch (BussinesException | IllegalArgumentException e) {
             logger.warn("Erro ao cadastrar produto: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 
