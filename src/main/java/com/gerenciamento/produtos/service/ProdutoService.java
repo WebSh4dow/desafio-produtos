@@ -1,21 +1,28 @@
 package com.gerenciamento.produtos.service;
 
 import com.gerenciamento.produtos.exception.BussinesException;
+import com.gerenciamento.produtos.model.Categoria;
 import com.gerenciamento.produtos.model.Produto;
+import com.gerenciamento.produtos.repository.CategoriaRepository;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 @Service
 public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -28,13 +35,24 @@ public class ProdutoService {
 
     private static final String ID_NAO_CADASTRA = "ID não deve ser fornecido ao cadastrar um novo produto.";
 
+    private static final String CATEGORIA_PRODUTO_NAO_EXISTE = "Não existe cadastro de categoria com código %d";
+
     private static final String NAO_PERMITIDO_SALDO_ESTOQUE_NEGATIVO = "Informe um saldo para quantidade em estoque, pois não pode ser negativo";
 
     public Produto cadastrar(Produto produto) {
         try {
 
+            Long categoriaId = produto.getCategoria().getId();
+
+            Optional<Categoria> categoria = categoriaRepository.findById(categoriaId);
+
+            if (!categoria.isPresent()) {
+                throw new BussinesException(
+                        String.format(CATEGORIA_PRODUTO_NAO_EXISTE, categoriaId));
+            }
+
             if (produto.getId() != null) {
-                throw new IllegalArgumentException(ID_NAO_CADASTRA);
+                throw new BussinesException(ID_NAO_CADASTRA);
             }
 
             if (produtoRepository.existeProdutoNomeCadastrado(produto.getNome()) != null) {
@@ -60,6 +78,7 @@ public class ProdutoService {
 
         return produto;
     }
+
 
     public void calcularPrecoVenda(BigDecimal precoCusto, Integer quantidadeProdutos, Produto produto) {
         BigDecimal valorVenda = BigDecimal.valueOf(quantidadeProdutos).multiply(precoCusto);
