@@ -40,6 +40,7 @@ public interface ProdutoRepositoryQuery {
 
     public static String PARAMETER_SEQUENCE =
             "sequenceName";
+
     public static String CONSULTAR_PRODUTOS_ATIVOS =
             "SELECT * FROM Produto " +
                     "WHERE ativo = true";
