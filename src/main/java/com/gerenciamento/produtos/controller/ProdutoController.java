@@ -6,6 +6,7 @@ import com.gerenciamento.produtos.repository.ProdutoRepository;
 import com.gerenciamento.produtos.service.ProdutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -65,4 +66,28 @@ public class ProdutoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro interno.");
         }
     }
+
+    @PutMapping("/atualizar/produto-existente/{produtoId}")
+    public ResponseEntity<?> atualizar(@RequestBody Produto produto, @PathVariable Long produtoId) {
+        try {
+            Produto produtoAtual = produtoService.buscarPor(produtoId);
+            if (produtoAtual != null){
+                BeanUtils.copyProperties(produto,produtoAtual,"id");
+                produtoAtual = produtoService.cadastrar(produtoAtual);
+
+                return ResponseEntity.ok().body(produtoAtual);
+            }
+
+            return ResponseEntity.notFound().build();
+
+        } catch (BussinesException | IllegalArgumentException e) {
+            logger.warn("Erro ao cadastrar produto: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+
+        } catch (Exception e) {
+            logger.error("Erro interno ao cadastrar produto", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro interno.");
+        }
+    }
+
 }
