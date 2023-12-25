@@ -13,6 +13,8 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,11 +31,11 @@ public class ProdutoService {
 
     private static final String PRODUTO_EXISTENTE = "Já existe um produto com o mesmo nome.";
 
+    private static final String PRODUTO_INEXISTENTE = "Não existe um produto com o código %d.";
+
     private static final String ERRO_MENSAGEM = "Ocorreu um erro ao tentar cadastrar um novo produto ";
 
     private static final String SKU_EXISTENTE = "Já existe um sku cadastrado no sistema.";
-
-    private static final String ID_NAO_CADASTRA = "ID não deve ser fornecido ao cadastrar um novo produto.";
 
     private static final String CATEGORIA_PRODUTO_NAO_EXISTE = "Não existe cadastro de categoria com código %d";
 
@@ -50,17 +52,20 @@ public class ProdutoService {
                 throw new BussinesException(
                         String.format(CATEGORIA_PRODUTO_NAO_EXISTE, categoriaId));
             }
+            List<Produto> produtosComMesmoNomeOuSkuCadastrado = new ArrayList<>();
 
-            if (produto.getId() != null) {
-                throw new BussinesException(ID_NAO_CADASTRA);
-            }
+            produtosComMesmoNomeOuSkuCadastrado.addAll(produtoRepository.existeProdutoNomeCadastrado(produto.getNome()));
+            produtosComMesmoNomeOuSkuCadastrado.addAll(produtoRepository.existeSkuProdutoCadastrado(produto.getSku()));
 
-            if (produtoRepository.existeProdutoNomeCadastrado(produto.getNome()) != null) {
-                throw new BussinesException(PRODUTO_EXISTENTE);
-            }
+            for (Produto produtoExistente : produtosComMesmoNomeOuSkuCadastrado) {
+                if (produtoExistente.equals(produto) && produtoExistente.getNome().equals(produto.getNome())) {
+                    throw new BussinesException(PRODUTO_EXISTENTE);
+                }
 
-            if (produtoRepository.existeSkuProdutoCadastrado(produto.getSku()) != null) {
-                throw new BussinesException(SKU_EXISTENTE);
+                if (produtoExistente.getSku().equals(produto.getSku()) && produtoExistente.getSku().equals(produto.getSku())) {
+                    throw new BussinesException(SKU_EXISTENTE);
+
+                }
             }
 
             if (produto.getQuantidadeEstoque() < 0) {
@@ -112,6 +117,11 @@ public class ProdutoService {
         entityManager.createNativeQuery("SELECT setval(:sequenceName, COALESCE((SELECT MAX(id) + 1 FROM produto), 1), false)")
                 .setParameter("sequenceName", sequenceName)
                 .executeUpdate();
+    }
+
+    public Produto buscarPor(Long produtoId) {
+        Produto restaurante = produtoRepository.findById(produtoId).get();
+        return restaurante;
     }
 
 }
