@@ -1,5 +1,6 @@
 package com.gerenciamento.produtos.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gerenciamento.produtos.exception.BussinesException;
 import com.gerenciamento.produtos.model.Categoria;
 import com.gerenciamento.produtos.model.Produto;
@@ -7,15 +8,21 @@ import com.gerenciamento.produtos.repository.CategoriaRepository;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
 import com.gerenciamento.produtos.repository.query.ProdutoRepositoryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -78,6 +85,19 @@ public class ProdutoService {
         return produto;
     }
 
+    public void mergeProduto(Map<String, Object> dadosOrigem, Produto produtoDestino) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Produto produtoOrigem = objectMapper.convertValue(dadosOrigem, Produto.class);
+
+        dadosOrigem.forEach((nomePropriedade, valorPropriedade) ->{
+            Field field = ReflectionUtils.findField(Produto.class,nomePropriedade);
+            field.setAccessible(true);
+
+            Object valorPropriedadeField = ReflectionUtils.getField(field,produtoOrigem);
+
+            ReflectionUtils.setField(field,produtoDestino,valorPropriedadeField);
+        });
+    }
 
     public void calcularPrecoVenda(BigDecimal precoCusto, Integer quantidadeProdutos, Produto produto) {
         BigDecimal valorVenda = BigDecimal.valueOf(quantidadeProdutos).multiply(precoCusto);
@@ -107,6 +127,15 @@ public class ProdutoService {
     public Produto buscarPor(Long produtoId) {
         Produto restaurante = produtoRepository.findById(produtoId).get();
         return restaurante;
+    }
+
+    public void remover(Produto produto) {
+        try {
+            produtoRepository.delete(produto);
+
+        }catch(EmptyResultDataAccessException e) {
+            throw new BussinesException(PRODUTO_INEXISTENTE);
+        }
     }
 
     @Transactional

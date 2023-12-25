@@ -42,11 +42,11 @@ public interface ProdutoRepositoryQuery {
             "sequenceName";
 
     public static String CONSULTAR_PRODUTOS_ATIVOS =
-            "SELECT * FROM Produto " +
+            "SELECT pr FROM Produto pr " +
                     "WHERE ativo = true";
 
     public static String CONSULTAR_PRODUTOS_INATIVOS =
-            "SELECT * FROM Produto " +
+            "SELECT pr FROM Produto pr " +
                     "WHERE ativo = false";
 
 

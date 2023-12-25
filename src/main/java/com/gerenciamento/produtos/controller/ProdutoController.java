@@ -1,5 +1,6 @@
 package com.gerenciamento.produtos.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gerenciamento.produtos.exception.BussinesException;
 import com.gerenciamento.produtos.model.Produto;
 import com.gerenciamento.produtos.model.assembler.ProdutoAssembler;
@@ -14,14 +15,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -40,6 +47,19 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     Logger logger = LoggerFactory.getLogger(ProdutoController.class);
+
+
+    @GetMapping("/ativos")
+    public ResponseEntity<Page<Produto>> buscarAtivos(@PageableDefault(size = 10) Pageable pageable) {
+        Page<Produto> produtosAtivos = produtoRepository.buscarProdutosAtivos(pageable);
+        return new ResponseEntity<>(produtosAtivos, HttpStatus.OK);
+    }
+
+    @GetMapping("/inativos")
+    public ResponseEntity<Page<Produto>> buscarInativos(@PageableDefault(size = 10) Pageable pageable) {
+        Page<Produto> produtosInativos = produtoRepository.buscarProdutosAtivos(pageable);
+        return new ResponseEntity<>(produtosInativos, HttpStatus.OK);
+    }
 
     @GetMapping("/listar/todos")
     public ResponseEntity<CollectionModel<ProdutoRepresentationModel>> listarTodosProdutos(
@@ -206,6 +226,33 @@ public class ProdutoController {
         } catch (Exception e) {
             logger.error("Erro interno ao cadastrar produto", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro interno.");
+        }
+    }
+
+    @PatchMapping("/editar-campos/{produtoId}")
+    public ResponseEntity<?> editarCamposProdutos(@PathVariable Long produtoId, @RequestBody Map<String,Object> campos) {
+        Produto ProdutoAtual = produtoService.buscarPor(produtoId);
+
+        if (ProdutoAtual == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        produtoService.mergeProduto(campos,ProdutoAtual);
+
+        return atualizar(ProdutoAtual, produtoId);
+    }
+
+
+    @DeleteMapping("/remover-produto/{produtoId}")
+    public ResponseEntity<?> remover(@PathVariable Long produtoId) {
+        try {
+            Produto produtoAtual = produtoService.buscarPor(produtoId);
+            produtoService.remover(produtoAtual);
+
+            return ResponseEntity.noContent().build();
+
+        } catch (EntityNotFoundException | NoSuchElementException exception) {
+            return ResponseEntity.badRequest().body("O produto não existe ou já foi realizado a exclusão do produto atual com id: " + produtoId);
         }
     }
 
