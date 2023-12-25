@@ -67,11 +67,13 @@ public class ProdutoController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @GetMapping("/pesquisar/por-id/{id}")
     public ResponseEntity<Produto> buscarProdutoPorId(@PathVariable Long id) {
         Produto produto = produtoRepository.findById(id).get();
         return new ResponseEntity<Produto>(produto, HttpStatus.OK);
     }
+
     @GetMapping("/filtrar/por-nome")
     public ResponseEntity<CollectionModel<ProdutoRepresentationModel>> consultarProdutoPorNome(
             @RequestParam("nome") String nome,
