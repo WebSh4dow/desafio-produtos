@@ -32,6 +32,14 @@ public interface ProdutoRepositoryQuery {
                     "FROM Produto " +
                     "pr WHERE pr.nome = ?1";
 
+    public static String NEXT_VALUE_SEQUENCE_PRODUTO =
+            "SELECT setval(:sequenceName, COALESCE((SELECT MAX(id) + 1 FROM produto), 1), false)";
+
+    public static String SEQUENCE_PRODUTO =
+            "seq_produto";
+
+    public static String PARAMETER_SEQUENCE =
+            "sequenceName";
 
     public static String CONSULTAR_PRODUTOS_ATIVOS =
             "SELECT * FROM Produto " +
