@@ -5,6 +5,7 @@ import com.gerenciamento.produtos.model.Categoria;
 import com.gerenciamento.produtos.model.Produto;
 import com.gerenciamento.produtos.repository.CategoriaRepository;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
+import com.gerenciamento.produtos.repository.query.ProdutoRepositoryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
@@ -29,7 +30,7 @@ public class ProdutoService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static final String PRODUTO_EXISTENTE = "Já existe um produto com o mesmo nome.";
+    private static final String PRODUTO_EXISTENTE = "Já existe um produto com o mesmo nome: ";
 
     private static final String PRODUTO_INEXISTENTE = "Não existe um produto com o código %d.";
 
@@ -52,20 +53,13 @@ public class ProdutoService {
                 throw new BussinesException(
                         String.format(CATEGORIA_PRODUTO_NAO_EXISTE, categoriaId));
             }
-            List<Produto> produtosComMesmoNomeOuSkuCadastrado = new ArrayList<>();
 
-            produtosComMesmoNomeOuSkuCadastrado.addAll(produtoRepository.existeProdutoNomeCadastrado(produto.getNome()));
-            produtosComMesmoNomeOuSkuCadastrado.addAll(produtoRepository.existeSkuProdutoCadastrado(produto.getSku()));
+            if (produto.getId() == null && produtoRepository.existeProdutoNomeCadastrado(produto.getNome()) != null) {
+                throw new BussinesException(PRODUTO_EXISTENTE + produto.getNome());
+            }
 
-            for (Produto produtoExistente : produtosComMesmoNomeOuSkuCadastrado) {
-                if (produtoExistente.equals(produto) && produtoExistente.getNome().equals(produto.getNome())) {
-                    throw new BussinesException(PRODUTO_EXISTENTE);
-                }
-
-                if (produtoExistente.getSku().equals(produto.getSku()) && produtoExistente.getSku().equals(produto.getSku())) {
-                    throw new BussinesException(SKU_EXISTENTE);
-
-                }
+            if (produto.getId() == null && produtoRepository.existeSkuProdutoCadastrado(produto.getSku()) != null) {
+                throw new BussinesException(SKU_EXISTENTE + produto.getSku());
             }
 
             if (produto.getQuantidadeEstoque() < 0) {
@@ -110,18 +104,17 @@ public class ProdutoService {
         return aliquata.multiply(porcentagemICMS);
     }
 
-    @Transactional
-    public void reiniciarSequenciaProduto() {
-        String sequenceName = "seq_produto";
-
-        entityManager.createNativeQuery("SELECT setval(:sequenceName, COALESCE((SELECT MAX(id) + 1 FROM produto), 1), false)")
-                .setParameter("sequenceName", sequenceName)
-                .executeUpdate();
-    }
-
     public Produto buscarPor(Long produtoId) {
         Produto restaurante = produtoRepository.findById(produtoId).get();
         return restaurante;
     }
 
+    @Transactional
+    public void reiniciarSequenciaProduto() {
+        String sequenceName = ProdutoRepositoryQuery.SEQUENCE_PRODUTO;
+
+        entityManager.createNativeQuery(ProdutoRepositoryQuery.NEXT_VALUE_SEQUENCE_PRODUTO)
+                .setParameter(ProdutoRepositoryQuery.PARAMETER_SEQUENCE, sequenceName)
+                .executeUpdate();
+    }
 }
