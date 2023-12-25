@@ -34,5 +34,10 @@ public interface ProdutoRepository extends JpaRepository<Produto,Long> {
 
     @Query(value = ProdutoRepositoryQuery.EXISTE_PRODUTO_COM_MESMO_NOME)
     List<Produto> existeProdutoNomeCadastrado(String nome);
+    @Query(value = ProdutoRepositoryQuery.CONSULTAR_PRODUTOS_INATIVOS)
+    Page<Produto> buscarProdutosInativos(Pageable pageable);
+
+    @Query(value = ProdutoRepositoryQuery.CONSULTAR_PRODUTOS_ATIVOS)
+    Page<Produto> buscarProdutosAtivos(Pageable pageable);
 
 }
