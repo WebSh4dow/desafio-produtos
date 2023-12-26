@@ -1,6 +1,5 @@
 package com.gerenciamento.produtos.controller;
 
-import com.gerenciamento.produtos.configuration.AuditoriaConfiguration;
 import com.gerenciamento.produtos.model.Auditoria;
 import com.gerenciamento.produtos.service.AuditoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
