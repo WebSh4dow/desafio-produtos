@@ -12,7 +12,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
@@ -59,14 +58,6 @@ public class ProdutoService {
             if (!categoria.isPresent()) {
                 throw new BussinesException(
                         String.format(CATEGORIA_PRODUTO_NAO_EXISTE, categoriaId));
-            }
-
-            if (produto.getId() == null && produtoRepository.existeProdutoNomeCadastrado(produto.getNome()) != null) {
-                throw new BussinesException(PRODUTO_EXISTENTE + produto.getNome());
-            }
-
-            if (produto.getId() == null && produtoRepository.existeSkuProdutoCadastrado(produto.getSku()) != null) {
-                throw new BussinesException(SKU_EXISTENTE + produto.getSku());
             }
 
             if (produto.getQuantidadeEstoque() < 0) {

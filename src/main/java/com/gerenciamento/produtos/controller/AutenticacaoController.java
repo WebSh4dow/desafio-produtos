@@ -90,7 +90,7 @@ public class AutenticacaoController {
     @PostMapping("/signup")
     public ResponseEntity<?> registrarUsuario(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByLogin(signUpRequest.getLogin())) {
-            return ResponseEntity.badRequest().body("Error Usuário iatual ja possui um refresh Token!");
+            return ResponseEntity.badRequest().body("Error Usuário atual ja possui um refresh Token!");
         }
 
         Usuario usuario = new Usuario(signUpRequest.getLogin(),

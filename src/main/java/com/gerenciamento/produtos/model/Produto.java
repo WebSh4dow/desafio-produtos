@@ -1,5 +1,11 @@
 package com.gerenciamento.produtos.model;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -9,6 +15,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "produto")
+@EntityListeners(AuditingEntityListener.class)
 @SequenceGenerator(name = "seq_produto", sequenceName = "seq_produto",allocationSize = 1, initialValue = 1)
 public class Produto implements Serializable {
 
@@ -35,13 +42,13 @@ public class Produto implements Serializable {
 
     private Integer quantidadeEstoque;
 
-    private BigDecimal icms = BigDecimal.ZERO;;
+    private BigDecimal icms = BigDecimal.ZERO;
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date dataCadastro;
-
     private boolean ativo;
+
 
     public boolean isAtivo() {
         return ativo;

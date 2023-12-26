@@ -30,10 +30,10 @@ public interface ProdutoRepository extends JpaRepository<Produto,Long> {
     Page<Produto> filtrarProdutoPorNomeAndCategoriaAndDataCadastroPageable(String nome, String categoria_id, Date dataCadastro, Pageable pageable);
 
     @Query(value = ProdutoRepositoryQuery.EXISTE_PRODUTO_COM_SKU_DUPLICADO)
-    List<Produto> existeSkuProdutoCadastrado(String sku);
+    Produto existeSkuProdutoCadastrado(String sku);
 
     @Query(value = ProdutoRepositoryQuery.EXISTE_PRODUTO_COM_MESMO_NOME)
-    List<Produto> existeProdutoNomeCadastrado(String nome);
+    Produto existeProdutoNomeCadastrado(String nome);
 
     @Query(value = ProdutoRepositoryQuery.CONSULTAR_PRODUTOS_INATIVOS)
     Page<Produto> buscarProdutosInativos(Pageable pageable);
