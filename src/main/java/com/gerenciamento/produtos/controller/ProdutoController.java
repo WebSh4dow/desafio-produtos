@@ -6,6 +6,7 @@ import com.gerenciamento.produtos.model.Produto;
 import com.gerenciamento.produtos.model.assembler.ProdutoAssembler;
 import com.gerenciamento.produtos.model.representation.ProdutoRepresentationModel;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
+import com.gerenciamento.produtos.service.AuditoriaService;
 import com.gerenciamento.produtos.service.ProdutoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -45,6 +43,13 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoService produtoService;
+
+    @Autowired
+    private AuditoriaService auditoriaService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     Logger logger = LoggerFactory.getLogger(ProdutoController.class);
 
@@ -119,6 +124,13 @@ public class ProdutoController {
             response.add(linkTo(methodOn(ProdutoController.class).consultarProdutoPorNome(nome, page + 1, size, sort)).withRel("next"));
         }
 
+        for (Produto produto : produtoPage) {
+            auditoriaService.registrarAuditoria("Nenhum Objeto a ser alterado", "CONSULTAR PRODUTOS POR NOME", new Date(), produto.getId());
+
+            auditoriaService.registrarAuditoriaDetalhada("Nenhum Objeto a ser alterado", "CONSULTAR PRODUTOS POR NOME", new Date(), produto.getId(),
+                    objectMapper.convertValue(produto, Map.class));
+        }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -146,6 +158,13 @@ public class ProdutoController {
         }
         if (produtoPage.hasNext()) {
             response.add(linkTo(methodOn(ProdutoController.class).consultarPorNomeECategoria(nome, categoria, page + 1, size, sort)).withRel("next"));
+        }
+
+        for (Produto produto : produtoPage) {
+            auditoriaService.registrarAuditoria("Nenhum Objeto a ser alterado", "CONSULTAR PRODUTOS POR NOME E CATEGORIA", new Date(), produto.getId());
+
+            auditoriaService.registrarAuditoriaDetalhada("Nenhum Objeto a ser alterado", "CONSULTAR PRODUTOS POR NOME E CATEGORIA", new Date(), produto.getId(),
+                    objectMapper.convertValue(produto, Map.class));
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -178,21 +197,43 @@ public class ProdutoController {
             response.add(linkTo(methodOn(ProdutoController.class).consultarPorMultiplosAtributos(nome, categoria, dataCadastro, page + 1, size, sort)).withRel("next"));
         }
 
+        for (Produto produto : produtoPage) {
+            auditoriaService.registrarAuditoria("Nenhum Objeto a ser alterado", "CONSULTAR PRODUTOS POR MULTIPLOS CAMPOS", new Date(), produto.getId());
+
+            auditoriaService.registrarAuditoriaDetalhada("Nenhum Objeto a ser alterado", "CONSULTAR PRODUTOS POR MULTIPLOS CAMPOS", new Date(), produto.getId(),
+                    objectMapper.convertValue(produto, Map.class));
+        }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/cadastrar/novo-produto")
     public ResponseEntity<?> cadastrar(@Valid @RequestBody Produto produto) {
         try {
-            logger.info("Cadastrando novo produto: {}", produto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.cadastrar(produto));
+
+            if (produto.getId() == null && produtoRepository.existeProdutoNomeCadastrado(produto.getNome()) != null) {
+                return ResponseEntity.badRequest().body("Já existe um produto cadastrado com nome: " + produto.getNome());
+            }
+
+            if (produto.getId() == null && produtoRepository.existeSkuProdutoCadastrado(produto.getSku()) != null) {
+                return ResponseEntity.badRequest().body("Já existe um produto cadastrado com sku: " + produto.getSku());
+            }
+
+            Produto produtoCadastrado = produtoService.cadastrar(produto);
+
+            auditoriaService.registrarAuditoria("Produto", "CADASTRO DE PRODUTOS", new Date(), produto.getId());
+
+            auditoriaService.registrarAuditoriaDetalhada("Produto", "CADASTRO DE PRODUTOS", new Date(), produtoCadastrado.getId(),
+                    objectMapper.convertValue(produtoCadastrado, Map.class));
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(produtoCadastrado);
 
         } catch (BussinesException | IllegalArgumentException e) {
-            logger.warn("Erro ao cadastrar produto: {}", e.getMessage());
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 
         } catch (Exception e) {
-            logger.error("Erro interno ao cadastrar produto", e);
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro interno.");
         }
     }
@@ -203,15 +244,21 @@ public class ProdutoController {
             Produto produtoAtual = produtoService.buscarPor(produtoId);
             if (produtoAtual != null) {
 
-                if (produtoRepository.existeProdutoNomeCadastrado(produto.getNome()).equals(produtoAtual.getNome())) {
-                    return ResponseEntity.badRequest().body("Existe produtos cadastrados com o mesmo nome.");
+                if (produto.getId() == null && produtoRepository.existeProdutoNomeCadastrado(produto.getNome()) != null) {
+                    return ResponseEntity.badRequest().body("Já existe um produto cadastrado com nome: " + produto.getNome());
                 }
 
-                if (produtoRepository.existeSkuProdutoCadastrado(produto.getSku()).equals(produtoAtual.getSku())) {
-                    return ResponseEntity.badRequest().body("Existe produtos cadastrados com o mesmo sku.");
+                if (produto.getId() == null && produtoRepository.existeSkuProdutoCadastrado(produto.getSku()) != null) {
+                    return ResponseEntity.badRequest().body("Já existe um produto cadastrado com sku: " + produto.getSku());
                 }
 
                 BeanUtils.copyProperties(produto, produtoAtual, "id");
+
+                auditoriaService.registrarAuditoria("Produto", "EDIÇÃO DE PRODUTOS", new Date(), produtoAtual.getId());
+
+                auditoriaService.registrarAuditoriaDetalhada("Produto", "EDIÇÃO DE PRODUTOS", new Date(), produtoAtual.getId(),
+                        getDiffFieldsProduto(produto, produtoAtual));
+
                 produtoAtual = produtoService.cadastrar(produtoAtual);
 
                 return ResponseEntity.ok().body(produtoAtual);
@@ -220,26 +267,34 @@ public class ProdutoController {
             return ResponseEntity.notFound().build();
 
         } catch (BussinesException | IllegalArgumentException e) {
-            logger.warn("Erro ao cadastrar produto: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 
-        } catch (Exception e) {
-            logger.error("Erro interno ao cadastrar produto", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro interno.");
+        }
+
+        catch (NoSuchElementException | EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi possivel encontrar o produto com o id: " + produtoId);
         }
     }
 
     @PatchMapping("/editar-campos/{produtoId}")
-    public ResponseEntity<?> editarCamposProdutos(@PathVariable Long produtoId, @RequestBody Map<String,Object> campos) {
-        Produto ProdutoAtual = produtoService.buscarPor(produtoId);
+    public ResponseEntity<?> editarCamposProdutos(@PathVariable Long produtoId,
+                                                  @RequestBody Map<String, Object> campos) {
+        Produto produtoAtual = produtoService.buscarPor(produtoId);
 
-        if (ProdutoAtual == null){
+        if (produtoAtual == null) {
             return ResponseEntity.notFound().build();
         }
 
-        produtoService.mergeProduto(campos,ProdutoAtual);
+        Produto produtoAntesEdicaoParcial = new Produto();
+        BeanUtils.copyProperties(produtoAtual, produtoAntesEdicaoParcial);
 
-        return atualizar(ProdutoAtual, produtoId);
+        produtoService.mergeProduto(campos, produtoAtual);
+
+        auditoriaService.registrarAuditoria("Produto", "ATUALIZAR CAMPOS PARCIALMENTE", new Date(), produtoAtual.getId());
+        auditoriaService.registrarAuditoriaDetalhada("Produto", "ATUALIZAR CAMPOS PARCIALMENTE", new Date(), produtoAtual.getId(),
+                getDiffFieldsProduto(produtoAntesEdicaoParcial, produtoAtual));
+
+        return atualizar(produtoAtual, produtoId);
     }
 
 
@@ -247,6 +302,12 @@ public class ProdutoController {
     public ResponseEntity<?> remover(@PathVariable Long produtoId) {
         try {
             Produto produtoAtual = produtoService.buscarPor(produtoId);
+
+            auditoriaService.registrarAuditoria("Produto", "EXCLUSÃO DE PRODUTOS", new Date(), produtoAtual.getId());
+
+            auditoriaService.registrarAuditoriaDetalhada("Produto", "EXCLUSÃO DE PRODUTOS", new Date(), produtoAtual.getId(),
+                    objectMapper.convertValue(produtoAtual, Map.class));
+
             produtoService.remover(produtoAtual);
 
             return ResponseEntity.noContent().build();
@@ -254,6 +315,24 @@ public class ProdutoController {
         } catch (EntityNotFoundException | NoSuchElementException exception) {
             return ResponseEntity.badRequest().body("O produto não existe ou já foi realizado a exclusão do produto atual com id: " + produtoId);
         }
+    }
+
+    private Map<String, Object> getDiffFieldsProduto(Object origem, Object destino) {
+        Map<String, Object> diffFields = new HashMap<>();
+        Field[] fields = origem.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object valorOrigemProduto = field.get(origem);
+                Object valorDestinoProduto = field.get(destino);
+                if (!Objects.equals(valorOrigemProduto, valorDestinoProduto)) {
+                    diffFields.put(field.getName(), valorDestinoProduto);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return diffFields;
     }
 
 }
