@@ -36,13 +36,10 @@ public class ProdutoService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static final String PRODUTO_EXISTENTE = "Já existe um produto com o mesmo nome: ";
 
     private static final String PRODUTO_INEXISTENTE = "Não existe um produto com o código %d.";
 
     private static final String ERRO_MENSAGEM = "Ocorreu um erro ao tentar cadastrar um novo produto ";
-
-    private static final String SKU_EXISTENTE = "Já existe um sku cadastrado no sistema.";
 
     private static final String CATEGORIA_PRODUTO_NAO_EXISTE = "Não existe cadastro de categoria com código %d";
 
