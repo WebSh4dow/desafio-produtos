@@ -42,19 +42,24 @@ public class ProdutoService {
     private static final String ERRO_MENSAGEM = "Ocorreu um erro ao tentar cadastrar um novo produto ";
 
     private static final String CATEGORIA_PRODUTO_NAO_EXISTE = "Não existe cadastro de categoria com código %d";
+    private static final String PRODUTO_SEM_CATEGORIA_ASSOCIADA = "Produto sem categoria associada.";
 
     private static final String NAO_PERMITIDO_SALDO_ESTOQUE_NEGATIVO = "Informe um saldo para quantidade em estoque, pois não pode ser negativo";
 
     public Produto cadastrar(Produto produto) {
         try {
+            Categoria categoria = produto.getCategoria();
 
-            Long categoriaId = produto.getCategoria().getId();
+            if (categoria == null) {
+                throw new BussinesException(PRODUTO_SEM_CATEGORIA_ASSOCIADA);
+            }
 
-            Optional<Categoria> categoria = categoriaRepository.findById(categoriaId);
+            Long categoriaId = categoria.getId();
 
-            if (!categoria.isPresent()) {
-                throw new BussinesException(
-                        String.format(CATEGORIA_PRODUTO_NAO_EXISTE, categoriaId));
+            Optional<Categoria> categoriaOptional = categoriaRepository.findById(categoriaId);
+
+            if (!categoriaOptional.isPresent()) {
+                throw new BussinesException(String.format(CATEGORIA_PRODUTO_NAO_EXISTE, categoriaId));
             }
 
             if (produto.getQuantidadeEstoque() < 0) {

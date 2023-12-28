@@ -62,7 +62,7 @@ public class ProdutoController {
 
     @GetMapping("/inativos")
     public ResponseEntity<Page<Produto>> buscarInativos(@PageableDefault(size = 10) Pageable pageable) {
-        Page<Produto> produtosInativos = produtoRepository.buscarProdutosAtivos(pageable);
+        Page<Produto> produtosInativos = produtoRepository.buscarProdutosInativos(pageable);
         return new ResponseEntity<>(produtosInativos, HttpStatus.OK);
     }
 
