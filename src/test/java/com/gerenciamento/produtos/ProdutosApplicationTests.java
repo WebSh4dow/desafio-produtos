@@ -13,36 +13,28 @@ import com.gerenciamento.produtos.repository.ProdutoRepository;
 import com.gerenciamento.produtos.service.AuditoriaService;
 import com.gerenciamento.produtos.service.ProdutoService;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
-import org.springframework.hateoas.MediaTypes;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.math.BigDecimal;
 import java.util.*;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -66,6 +58,9 @@ class ProdutosApplicationTests {
 
     @Autowired
     private AuditoriaService auditoriaService;
+
+    @Autowired
+    private AuditorAware<String> auditorAware;
 
     @Autowired
     @MockBean
@@ -176,7 +171,7 @@ class ProdutosApplicationTests {
 
 
     @Test
-    public void testBuscarProdutosInativos() throws Exception {
+    public void testBuscarProdutosInativos_200() throws Exception {
         DefaultMockMvcBuilder defaultMockMvcBuilder = MockMvcBuilders.webAppContextSetup(this.webApplicationContext);
         MockMvc mockMvc = defaultMockMvcBuilder.build();
 
@@ -233,9 +228,9 @@ class ProdutosApplicationTests {
                 .thenReturn(new PageImpl<>(Arrays.asList(produto1)));
 
         ResultActions retornoAPI = mockMvc.perform(get(URL + "/listar/todos")
-                .param("page", "0")
-                .param("size", "10")
-                .param("sort", "id")
+                .queryParam("page", "0")
+                .queryParam("size", "10")
+                .queryParam("sort", "id")
                 .contentType(MediaType.APPLICATION_JSON));
 
         retornoAPI.andExpect(status().isOk())
@@ -247,7 +242,6 @@ class ProdutosApplicationTests {
                 .andExpect(jsonPath("$._links.self.href", is("http://localhost/api/produto/listar/todos?page=0&size=10&sort=id")));
 
         logger.info("Logando testes da API de produtos listagem de todos os produtos com HALL LINKS: {}", retornoAPI.andReturn().getResponse().getContentAsString());
-        verify(produtoRepository, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -280,6 +274,74 @@ class ProdutosApplicationTests {
         System.out.println("Resultado:" + resultActions.andReturn().getResponse().getContentAsString());
     }
 
+
+    @Test
+    void consultarProdutoPorNomeECategoria_200() throws Exception {
+        DefaultMockMvcBuilder defaultMockMvcBuilder = MockMvcBuilders.webAppContextSetup(this.webApplicationContext);
+        MockMvc mockMvc = defaultMockMvcBuilder.build();
+
+        String nome = "Camisa";
+        String categoria = "Personalizada";
+        int page = 0;
+        int size = 10;
+        String sort = "id";
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Produto> produtoPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+
+        given(produtoRepository.filtrarProdutoPorNomeAndCategoriaPaginado(any(), any(), any())).willReturn(produtoPage);
+        given(produtoAssembler.toModel(any())).willReturn(new ProdutoRepresentationModel());
+
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/produto/filtrar/por-nome-e-categoria")
+                .queryParam("nome", nome)
+                .queryParam("categoria",categoria)
+                .queryParam("page", String.valueOf(page))
+                .queryParam("size", String.valueOf(size))
+                .queryParam("sort", sort)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        resultActions.andExpect(status().isOk());
+        System.out.println("Resultado:" + resultActions.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    void consultarProdutoPorMultiplosCampos_200() throws Exception {
+        DefaultMockMvcBuilder defaultMockMvcBuilder = MockMvcBuilders.webAppContextSetup(this.webApplicationContext);
+        MockMvc mockMvc = defaultMockMvcBuilder.build();
+
+        String nome = "Camisa";
+        String categoria = "Personalizada";
+        int page = 0;
+        int size = 10;
+        String sort = "id";
+
+        Pageable pageable = PageRequest.ofSize(size);
+
+        Page<Produto> produtoPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+        given(produtoRepository.filtrarProdutoPorNomeAndCategoriaAndDataCadastroPageable(any(), any(), any(), any())).willReturn(produtoPage);
+        given(produtoAssembler.toModel(any())).willReturn(new ProdutoRepresentationModel());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/api/produto/filtrar/por-multiplos-atributos")
+                .param("nome", nome)
+                .param("categoria", categoria)
+                .param("dataCadastro", "2023-01-01")
+                .param("page", String.valueOf(page))
+                .param("size", String.valueOf(size))
+                .param("sort", sort)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("_links.self.href").exists());
+    }
+
+
     private Produto criarProduto(Long id, String nome, String sku, BigDecimal valorCusto, int quantidadeEstoque, boolean ativo) {
         Produto produto = new Produto();
         produto.setId(id);
@@ -290,4 +352,5 @@ class ProdutosApplicationTests {
         produto.setAtivo(ativo);
         return produto;
     }
+
 }

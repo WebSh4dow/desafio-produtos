@@ -2,6 +2,9 @@ package com.gerenciamento.produtos.controller;
 
 import com.gerenciamento.produtos.model.Auditoria;
 import com.gerenciamento.produtos.service.AuditoriaService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auditoria")
+@ApiOperation("Listar auditorias")
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "Authorization", value = "Token JWT Bearer", required = true, dataType = "string", paramType = "header")
+})
 public class AuditoriaController {
 
     @Autowired

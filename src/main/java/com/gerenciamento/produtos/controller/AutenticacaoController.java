@@ -4,6 +4,7 @@ import com.gerenciamento.produtos.exception.BussinesException;
 import com.gerenciamento.produtos.exception.TokenRefreshException;
 import com.gerenciamento.produtos.model.Acesso;
 import com.gerenciamento.produtos.model.Usuario;
+import com.gerenciamento.produtos.openApiController.AutentecacaoControllerOpenApi;
 import com.gerenciamento.produtos.repository.AcessoRepository;
 import com.gerenciamento.produtos.repository.UsuarioRepository;
 import com.gerenciamento.produtos.security.model.RefreshToken;
@@ -11,10 +12,13 @@ import com.gerenciamento.produtos.security.provider.JwtTokenProvider;
 import com.gerenciamento.produtos.security.provider.RefreshTokenProvider;
 import com.gerenciamento.produtos.security.request.LoginRequest;
 import com.gerenciamento.produtos.security.request.SignupRequest;
+import com.gerenciamento.produtos.security.request.SignupSimpleRequest;
 import com.gerenciamento.produtos.security.request.TokenRefreshRequest;
 import com.gerenciamento.produtos.security.response.JwtResponse;
 import com.gerenciamento.produtos.security.response.TokenRefreshResponse;
 import com.gerenciamento.produtos.service.UsuarioService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,7 +39,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AutenticacaoController {
+public class AutenticacaoController implements AutentecacaoControllerOpenApi {
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -58,14 +62,14 @@ public class AutenticacaoController {
     @Autowired
     private RefreshTokenProvider refreshTokenService;
 
-    private static String ACESSO_NORMAL = "NORMAL";
+    private static final String ACESSO_NORMAL = "NORMAL";
 
-    private static String ACESSO_ESTOQUISTA = "ESTOQUISTA";
+    private static final String ACESSO_ESTOQUISTA = "ESTOQUISTA";
 
-    private static String ACESSO_ADMINISTRADOR = "ADMINISTRADOR";
+    private static final String ACESSO_ADMINISTRADOR = "ADMINISTRADOR";
 
     @PostMapping("/signin")
-    public ResponseEntity<?> autenticarUsuario(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> autenticarUsuario(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getSenha())
@@ -88,7 +92,7 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<String> registrarUsuario(@Valid @RequestBody SignupSimpleRequest signUpRequest) {
         if (userRepository.existsByLogin(signUpRequest.getLogin())) {
             return ResponseEntity.badRequest().body("Error Usuário atual ja possui um refresh Token!");
         }
@@ -133,7 +137,7 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<TokenRefreshResponse> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         return refreshTokenService.findByToken(requestRefreshToken)
@@ -151,7 +155,7 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<String> logoutUser() {
         Usuario userDetails = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = userDetails.getId();
         refreshTokenService.deleteByUserId(userId);
