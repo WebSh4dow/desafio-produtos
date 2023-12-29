@@ -6,36 +6,43 @@ import com.gerenciamento.produtos.controller.ProdutoController;
 import com.gerenciamento.produtos.enums.Tipo;
 import com.gerenciamento.produtos.model.Categoria;
 import com.gerenciamento.produtos.model.Produto;
+import com.gerenciamento.produtos.model.assembler.ProdutoAssembler;
+import com.gerenciamento.produtos.model.representation.ProdutoRepresentationModel;
 import com.gerenciamento.produtos.repository.CategoriaRepository;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
 import com.gerenciamento.produtos.service.AuditoriaService;
 import com.gerenciamento.produtos.service.ProdutoService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -63,6 +70,10 @@ class ProdutosApplicationTests {
     @Autowired
     @MockBean
     private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    @MockBean
+    private ProdutoAssembler produtoAssembler;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -239,8 +250,37 @@ class ProdutosApplicationTests {
         verify(produtoRepository, times(1)).findAll(any(Pageable.class));
     }
 
+    @Test
+    void consultarProdutoPorNome() throws Exception {
+        DefaultMockMvcBuilder defaultMockMvcBuilder = MockMvcBuilders.webAppContextSetup(this.webApplicationContext);
+        MockMvc mockMvc = defaultMockMvcBuilder.build();
 
-	private Produto criarProduto(Long id, String nome, String sku, BigDecimal valorCusto, int quantidadeEstoque, boolean ativo) {
+        String nome = "Camisa";
+        int page = 0;
+        int size = 10;
+        String sort = "id";
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Produto> produtoPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+
+
+        given(produtoRepository.filtrarProdutoPorNomePaginado(any(), any())).willReturn(produtoPage);
+        given(produtoAssembler.toModel(any())).willReturn(new ProdutoRepresentationModel());
+
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/produto/filtrar/por-nome")
+                .queryParam("nome", nome)
+                .queryParam("page", String.valueOf(page))
+                .queryParam("size", String.valueOf(size))
+                .queryParam("sort", sort)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        resultActions.andExpect(status().isOk());
+        System.out.println("Resultado:" + resultActions.andReturn().getResponse().getContentAsString());
+    }
+
+    private Produto criarProduto(Long id, String nome, String sku, BigDecimal valorCusto, int quantidadeEstoque, boolean ativo) {
         Produto produto = new Produto();
         produto.setId(id);
         produto.setNome(nome);
@@ -250,8 +290,4 @@ class ProdutosApplicationTests {
         produto.setAtivo(ativo);
         return produto;
     }
-
-
-
-
 }
