@@ -15,6 +15,7 @@ public class AuthorizationChecker {
         return authorities.stream()
                 .anyMatch(authority -> "ESTOQUISTA".equals(authority.getAuthority()));
     }
+
     public static Collection<? extends GrantedAuthority> obterAuthorities() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
