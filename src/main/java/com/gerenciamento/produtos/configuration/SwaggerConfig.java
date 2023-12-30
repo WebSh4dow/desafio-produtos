@@ -5,21 +5,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.OAuthBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.SecurityConfiguration;
-import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
-import springfox.documentation.swagger.web.UiConfiguration;
-import springfox.documentation.swagger.web.UiConfigurationBuilder;
-
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+
 
 @Configuration
 public class SwaggerConfig {
@@ -41,7 +34,7 @@ public class SwaggerConfig {
                 .title("Gerenciamento de Produtos API")
                 .description("API para gerenciamento de produtos.")
                 .version("1.0.0")
-                .contact(new Contact("Seu Nome", "https://github.com/seu-usuario", "seu-email@example.com"))
+                .contact(new Contact("Jarmison Paiva", "https://github.com/WebSh4dow", "phantomrising@protonmail.com"))
                 .license("Apache License 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0")
                 .build();

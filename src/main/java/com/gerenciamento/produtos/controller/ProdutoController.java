@@ -5,6 +5,7 @@ import com.gerenciamento.produtos.exception.BussinesException;
 import com.gerenciamento.produtos.model.Produto;
 import com.gerenciamento.produtos.model.assembler.ProdutoAssembler;
 import com.gerenciamento.produtos.model.representation.ProdutoRepresentationModel;
+import com.gerenciamento.produtos.openApiController.ProdutoControllerOpenApi;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
 import com.gerenciamento.produtos.service.AuditoriaService;
 import com.gerenciamento.produtos.service.ProdutoService;
@@ -32,7 +33,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/produto")
-public class ProdutoController {
+public class ProdutoController implements ProdutoControllerOpenApi {
 
     @Autowired
     private ProdutoRepository produtoRepository;
