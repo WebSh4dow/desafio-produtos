@@ -20,6 +20,10 @@ public class UsuarioService implements UserDetailsService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private static final String BEGIN_ALTER = "begin; alter table usuarios_acesso drop constraint ";
+
+    private static final String COMMIT = "; commit;";
+
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         return usuarioRepository.findByLogin(login)
@@ -31,7 +35,7 @@ public class UsuarioService implements UserDetailsService {
             List<String> constraints = usuarioRepository.consultarConstraintAcesso();
             if (constraints != null && !constraints.isEmpty()) {
                 for (String constraint : constraints) {
-                    jdbcTemplate.execute("begin; alter table usuarios_acesso drop constraint " + constraint + "; commit;");
+                    jdbcTemplate.execute(BEGIN_ALTER + constraint + COMMIT);
                 }
             }
         } catch (Exception e) {
