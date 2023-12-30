@@ -4,7 +4,7 @@ import com.gerenciamento.produtos.exception.BussinesException;
 import com.gerenciamento.produtos.exception.TokenRefreshException;
 import com.gerenciamento.produtos.model.Acesso;
 import com.gerenciamento.produtos.model.Usuario;
-import com.gerenciamento.produtos.openApiController.AutentecacaoControllerOpenApi;
+import com.gerenciamento.produtos.openApiController.AutenticacaoControllerOpenApi;
 import com.gerenciamento.produtos.repository.AcessoRepository;
 import com.gerenciamento.produtos.repository.UsuarioRepository;
 import com.gerenciamento.produtos.security.model.RefreshToken;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AutenticacaoController implements AutentecacaoControllerOpenApi {
+public class AutenticacaoController implements AutenticacaoControllerOpenApi {
 
     @Autowired
     private AuthenticationManager authenticationManager;

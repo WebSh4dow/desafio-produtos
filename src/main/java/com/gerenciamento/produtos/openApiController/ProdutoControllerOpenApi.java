@@ -9,10 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.Date;
 import java.util.Map;
 
-@Validated
+
 @Api(tags = "Produtos")
 public interface ProdutoControllerOpenApi {
 
@@ -25,7 +27,7 @@ public interface ProdutoControllerOpenApi {
             @ApiResponse(code = 403, message = "Não possui Permissão para acesso"),
             @ApiResponse(code = 500, message = "Erro interno no servidor")
     })
-    ResponseEntity<Page<Produto>> buscarAtivos(Pageable pageable);
+    ResponseEntity<CollectionModel<ProdutoRepresentationModel>> buscarAtivos(Pageable pageable);
 
     @ApiOperation(value = "Busca por produtos inativos com paginação")
     @ApiResponses({
@@ -36,7 +38,7 @@ public interface ProdutoControllerOpenApi {
             @ApiResponse(code = 403, message = "Não possui Permissão para acesso"),
             @ApiResponse(code = 500, message = "Erro interno no servidor")
     })
-    ResponseEntity<Page<Produto>> buscarInativos(Pageable pageable);
+    ResponseEntity<CollectionModel<ProdutoRepresentationModel>> buscarInativos(Pageable pageable);
 
     @ApiOperation(value = "Busca todos os produtos usando paginação dinamica com halllinks")
     @ApiResponses({
@@ -58,7 +60,7 @@ public interface ProdutoControllerOpenApi {
             @ApiResponse(code = 403, message = "Não possui Permissão para acesso"),
             @ApiResponse(code = 500, message = "Erro interno no servidor")
     })
-    ResponseEntity<Produto> buscarProdutoPorId(Long id);
+    ResponseEntity<CollectionModel<ProdutoRepresentationModel>> buscarProdutoPorIdPaginado(Long id);
 
     @ApiOperation(value = "Busca determinados produtos por nome")
     @ApiResponses({

@@ -11,9 +11,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.Valid;
 
-@Validated
+
 @Api(tags = "Autenticação")
-public interface AutentecacaoControllerOpenApi {
+public interface AutenticacaoControllerOpenApi {
 
     @ApiOperation(value = "Autentica um usuário que foi cadastrado e retorna o token JWT")
     @ApiResponses({

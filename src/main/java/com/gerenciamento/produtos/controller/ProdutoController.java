@@ -22,6 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -55,15 +56,29 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
 
     @GetMapping("/ativos")
-    public ResponseEntity<Page<Produto>> buscarAtivos(@PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<CollectionModel<ProdutoRepresentationModel>> buscarAtivos(@PageableDefault(size = 10) Pageable pageable) {
         Page<Produto> produtosAtivos = produtoRepository.buscarProdutosAtivos(pageable);
-        return new ResponseEntity<>(produtosAtivos, HttpStatus.OK);
+        List<ProdutoRepresentationModel> produtoModels = produtosAtivos.stream()
+                .map(produtoAssembler::toModel)
+                .collect(Collectors.toList());
+
+        CollectionModel<ProdutoRepresentationModel> response = CollectionModel.of(produtoModels,
+                linkTo(methodOn(ProdutoController.class).buscarAtivos(pageable)).withSelfRel());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/inativos")
-    public ResponseEntity<Page<Produto>> buscarInativos(@PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<CollectionModel<ProdutoRepresentationModel>> buscarInativos(@PageableDefault(size = 10) Pageable pageable) {
         Page<Produto> produtosInativos = produtoRepository.buscarProdutosInativos(pageable);
-        return new ResponseEntity<>(produtosInativos, HttpStatus.OK);
+        List<ProdutoRepresentationModel> produtoModels = produtosInativos.stream()
+                .map(produtoAssembler::toModel)
+                .collect(Collectors.toList());
+
+        CollectionModel<ProdutoRepresentationModel> response = CollectionModel.of(produtoModels,
+                linkTo(methodOn(ProdutoController.class).buscarInativos(pageable)).withSelfRel());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/listar/todos")
@@ -93,10 +108,18 @@ public class ProdutoController implements ProdutoControllerOpenApi {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/pesquisar/por-id/{id}")
-    public ResponseEntity<Produto> buscarProdutoPorId(@PathVariable Long id) {
-        Produto produto = produtoRepository.findById(id).get();
-        return new ResponseEntity<Produto>(produto, HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<CollectionModel<ProdutoRepresentationModel>> buscarProdutoPorIdPaginado(@PathVariable Long id) {
+        Produto produto = produtoRepository.findById(id).orElse(null);
+
+        if (produto == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        ProdutoRepresentationModel produtoModel = produtoAssembler.toModel(produto);
+        CollectionModel<ProdutoRepresentationModel> response = CollectionModel.of(Collections.singletonList(produtoModel));
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/filtrar/por-nome")
