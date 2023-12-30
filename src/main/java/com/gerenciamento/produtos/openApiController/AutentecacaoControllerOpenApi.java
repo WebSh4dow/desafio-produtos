@@ -1,7 +1,6 @@
 package com.gerenciamento.produtos.openApiController;
 
 import com.gerenciamento.produtos.security.request.LoginRequest;
-import com.gerenciamento.produtos.security.request.SignupRequest;
 import com.gerenciamento.produtos.security.request.SignupSimpleRequest;
 import com.gerenciamento.produtos.security.request.TokenRefreshRequest;
 import com.gerenciamento.produtos.security.response.JwtResponse;
