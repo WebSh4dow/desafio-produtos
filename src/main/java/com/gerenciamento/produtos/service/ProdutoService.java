@@ -8,18 +8,15 @@ import com.gerenciamento.produtos.repository.CategoriaRepository;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
 import com.gerenciamento.produtos.repository.query.ProdutoRepositoryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +32,6 @@ public class ProdutoService {
 
     @PersistenceContext
     private EntityManager entityManager;
-
 
     private static final String PRODUTO_INEXISTENTE = "Não existe um produto com o código %d.";
 

@@ -2,10 +2,6 @@ package com.gerenciamento.produtos.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -76,6 +72,10 @@ public class Produto implements Serializable {
             notes = "Informações sobre status ativo ou inativo do produto",
             example = "true")
     private boolean ativo;
+
+    @ApiModelProperty(
+            notes = "Informações sobre campos visiveis ativo ou inativo do produto",
+            example = "true")
 
 
     public boolean isAtivo() {

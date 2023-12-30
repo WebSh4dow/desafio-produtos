@@ -1,8 +1,12 @@
 package com.gerenciamento.produtos.model.representation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.gerenciamento.produtos.model.Categoria;
+import com.gerenciamento.produtos.model.Produto;
+import com.gerenciamento.produtos.security.checker.AuthorizationChecker;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -12,12 +16,14 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
+import org.springframework.security.core.GrantedAuthority;
+
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Date;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @JsonRootName(value = "produtos")
@@ -69,6 +75,46 @@ public class ProdutoRepresentationModel extends RepresentationModel<ProdutoRepre
             notes = "Informações sobre status ativo ou inativo do produto",
             example = "true")
     private boolean ativo;
+
+
+    public ProdutoRepresentationModel() {
+    }
+
+    public ProdutoRepresentationModel(Produto produto, Collection<? extends GrantedAuthority> authorities) {
+        this();
+
+        boolean isEstoquista = AuthorizationChecker.isEstoquista(authorities);
+
+        this.id = produto.getId();
+        this.nome = produto.getNome();
+        this.sku = produto.getSku();
+        this.ativo = produto.isAtivo();
+        this.categoria = produto.getCategoria();
+        this.dataCadastro = produto.getDataCadastro();
+        this.quantidadeEstoque = produto.getQuantidadeEstoque();
+        this.valorVenda = produto.getValorVenda();
+        this.valorCusto = produto.getValorCusto();
+        this.icms = produto.getIcms();
+
+        if (isEstoquista) {
+            this.icms = BigDecimal.ZERO;
+            this.valorCusto = BigDecimal.ZERO;
+            this.valorVenda = BigDecimal.ZERO;
+        }
+    }
+
+    public ProdutoRepresentationModel(Produto entity) {
+        this.id = entity.getId();
+        this.nome = entity.getNome();
+        this.icms = entity.getIcms();
+        this.sku = entity.getSku();
+        this.ativo = entity.isAtivo();
+        this.categoria = entity.getCategoria();
+        this.valorCusto = entity.getValorCusto();
+        this.valorVenda = entity.getValorVenda();
+        this.dataCadastro = entity.getDataCadastro();
+        this.quantidadeEstoque = entity.getQuantidadeEstoque();
+    }
 
     public Long getId() {
         return id;
