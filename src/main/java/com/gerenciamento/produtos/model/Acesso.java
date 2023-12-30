@@ -1,6 +1,8 @@
 package com.gerenciamento.produtos.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.*;
 import java.util.Objects;
@@ -8,15 +10,18 @@ import java.util.Objects;
 @Entity
 @Table(name = "acesso")
 @SequenceGenerator(name = "seq_acesso", sequenceName = "seq_acesso", allocationSize = 1, initialValue = 1)
+@ApiModel(description = "Modelo de representação de Acesso")
 public class Acesso implements GrantedAuthority {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_acesso")
+    @ApiModelProperty(notes = "id de acesso", example = "1")
     private Long id;
 
     @Column(nullable = false)
+    @ApiModelProperty(notes = "descrição do acesso", example = "NORMAL")
     private String descricao;
 
     @Override
