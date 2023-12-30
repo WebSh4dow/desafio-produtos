@@ -1,6 +1,7 @@
 package com.gerenciamento.produtos.controller;
 
 import com.gerenciamento.produtos.model.Auditoria;
+import com.gerenciamento.produtos.openApiController.AuditoriaControllerOpenApi;
 import com.gerenciamento.produtos.service.AuditoriaService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @ApiImplicitParams({
         @ApiImplicitParam(name = "Authorization", value = "Token JWT Bearer", required = true, dataType = "string", paramType = "header")
 })
-public class AuditoriaController {
+public class AuditoriaController implements AuditoriaControllerOpenApi {
 
     @Autowired
     private AuditoriaService auditoriaService;
