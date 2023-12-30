@@ -1,22 +1,35 @@
 package com.gerenciamento.produtos.security.request;
 
 import com.gerenciamento.produtos.model.Acesso;
-
-import javax.validation.constraints.Email;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
-public class SignupRequest{
+@ApiModel(description = "Modelo para enviar uma  requisição para efetuar o cadastro inicial no sistema")
+public class SignupRequest {
 
     @NotBlank
     @Size(min = 3, max = 20)
+    @ApiModelProperty(
+            notes = "nome do usuario",
+            example = "Francisco Jarmison de Sousa Paiva"
+    )
     private String login;
 
+    @ApiModelProperty(
+            notes = "Acessos do usuário",
+            example = "[{\"id\": 1, \"descricao\": \"NORMAL\"}]"
+    )
     private Set<Acesso> acessos;
 
     @NotBlank
     @Size(min = 6, max = 40)
+    @ApiModelProperty(
+            notes = "senha do usuário",
+            example = "qualquerSenha123"
+    )
     private String senha;
 
     public String getLogin() {

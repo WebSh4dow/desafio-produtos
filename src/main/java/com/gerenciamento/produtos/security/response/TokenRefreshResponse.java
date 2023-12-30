@@ -1,9 +1,17 @@
 package com.gerenciamento.produtos.security.response;
 
-public class TokenRefreshResponse {
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel(description = "Modelo de representação refresh token")
+public class TokenRefreshResponse {
+    @ApiModelProperty(notes = "Access token do jwt gerado", example = "342432423-fdsfsf332-432423ref")
     private String accessToken;
+
+    @ApiModelProperty(notes = "Refresh token do jwt gerado", example = "342432423-fdsfsf332-432423ref")
     private String refreshToken;
+
+    @ApiModelProperty(notes = "Tipo do jwt", example = "Bearer")
     private String tokenType = "Bearer";
 
     public TokenRefreshResponse(String accessToken, String refreshToken) {

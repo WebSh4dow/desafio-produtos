@@ -1,5 +1,7 @@
 package com.gerenciamento.produtos.model;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
@@ -11,16 +13,20 @@ import java.util.Set;
 @Entity
 @Table(name = "usuario")
 @SequenceGenerator(name = "seq_usuario", sequenceName = "seq_usuario", allocationSize = 1, initialValue = 1)
+@ApiModel(description = "Modelo de representação de Usuários")
 public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_usuario")
+    @ApiModelProperty(notes = "id do usuário", example = "1")
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @ApiModelProperty(notes = "nome do usuário ou nickname", example = "javaNextGenDeveloper")
     private String login;
 
     @Column(nullable = false)
+    @ApiModelProperty(notes = "senha do usuário", example = "jadGenDev572")
     private String senha;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -31,6 +37,10 @@ public class Usuario implements UserDetails {
                     foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
             inverseJoinColumns = @JoinColumn(name = "acesso_id", unique = false, referencedColumnName = "id", table = "acesso",
                     foreignKey = @ForeignKey(name = "acesso_fk", value = ConstraintMode.CONSTRAINT))
+    )
+    @ApiModelProperty(
+            notes = "Acessos do usuário",
+            example = "[{\"id\": 1, \"descricao\": \"NORMAL\"}]"
     )
     private Set<Acesso> acessos = new HashSet<>();
 
