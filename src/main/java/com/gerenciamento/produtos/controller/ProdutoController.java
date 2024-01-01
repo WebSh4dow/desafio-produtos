@@ -20,6 +20,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -284,18 +287,18 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
                 produtoAtual = produtoService.cadastrar(produtoAtual);
 
-                return ResponseEntity.ok().body(produtoAtual);
+                ProdutoRepresentationModel produtoModel = produtoAssembler.toModel(produtoAtual);
+
+                return ResponseEntity.ok().body(produtoModel);
             }
 
             return ResponseEntity.notFound().build();
 
         } catch (BussinesException | IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-        }
-
-        catch (NoSuchElementException | EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi possivel encontrar o produto com o id: " + produtoId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 

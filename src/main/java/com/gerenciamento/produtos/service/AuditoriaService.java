@@ -71,8 +71,12 @@ public class AuditoriaService {
         detalheAuditoria.setObjetoAlterado(objetoAlterado);
         detalheAuditoria.setObjetoId(objetoId);
         detalheAuditoria.setCampo(campo);
-        detalheAuditoria.setValorAnterior(valorAnterior);
-        detalheAuditoria.setValorAtual(valorAtual);
+
+        if (!Objects.equals(valorAtual, valorAnterior)) {
+            detalheAuditoria.setValorAnterior(valorAnterior);
+            detalheAuditoria.setValorAtual(valorAtual);
+            detalheAuditoriaRepository.save(detalheAuditoria);
+        }
 
         detalheAuditoriaRepository.save(detalheAuditoria);
     }
