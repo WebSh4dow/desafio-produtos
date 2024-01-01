@@ -297,7 +297,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
         } catch (BussinesException | IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
