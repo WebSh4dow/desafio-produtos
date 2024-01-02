@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @ApiModel(description = "Modelo para enviar uma simples requisição para efetuar o cadastro inicial no sistema")
-public class SignupSimpleRequest extends SignupRequest {
+public class SignupSimpleRequest  {
 
     @NotBlank
     @Size(min = 3, max = 20)

@@ -1,8 +1,6 @@
 package com.gerenciamento.produtos.model.representation;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.gerenciamento.produtos.model.Categoria;
 import com.gerenciamento.produtos.model.Produto;
@@ -10,14 +8,9 @@ import com.gerenciamento.produtos.security.checker.AuthorizationChecker;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.security.core.GrantedAuthority;
-
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;

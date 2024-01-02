@@ -1,6 +1,7 @@
 package com.gerenciamento.produtos.openApiController;
 
 import com.gerenciamento.produtos.security.request.LoginRequest;
+import com.gerenciamento.produtos.security.request.SignupRequest;
 import com.gerenciamento.produtos.security.request.SignupSimpleRequest;
 import com.gerenciamento.produtos.security.request.TokenRefreshRequest;
 import com.gerenciamento.produtos.security.response.JwtResponse;
@@ -35,7 +36,7 @@ public interface AutenticacaoControllerOpenApi {
             @ApiResponse(code = 400, message = "Erro de requisição"),
             @ApiResponse(code = 500, message = "Erro interno no servidor")
     })
-    ResponseEntity<String> registrarUsuario(@Valid @RequestBody SignupSimpleRequest signUpRequest);
+    ResponseEntity<String> registrarUsuario(@Valid @RequestBody SignupRequest signUpRequest);
 
     @ApiOperation(value = "Atualiza o token JWT usando o token de atualização")
     @ApiResponses({

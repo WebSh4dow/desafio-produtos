@@ -21,6 +21,18 @@ public interface ProdutoRepositoryQuery {
             "OR UPPER(TRIM(cat.nome)) LIKE %?2%" +
             "OR pr.dataCadastro = ?3";
 
+    public static String FILTRAR_VALORES_AGREGADOS_PRODUTOS =
+            "SELECT p.id AS produtoId, " +
+                    "p.nome AS produtoNome, " +
+                    "p.valorCusto AS valorCusto, " +
+                    "p.valorVenda AS valorVenda, " +
+                    "p.quantidadeEstoque AS quantidadeEstoque, " +
+                    "c.nome AS categoriaNome, " +
+                    "(p.valorCusto * p.quantidadeEstoque) AS custoTotal, " +
+                    "(p.valorVenda * p.quantidadeEstoque) AS valorTotalPrevisto " +
+                    "FROM Produto p " +
+                    "JOIN p.categoria c " +
+                    "WHERE p.ativo = true";
 
     public static String EXISTE_PRODUTO_COM_SKU_DUPLICADO =
             "SELECT pr " +
