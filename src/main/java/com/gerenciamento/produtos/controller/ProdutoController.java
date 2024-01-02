@@ -3,10 +3,13 @@ package com.gerenciamento.produtos.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gerenciamento.produtos.exception.BussinesException;
 import com.gerenciamento.produtos.model.Produto;
+import com.gerenciamento.produtos.model.assembler.ProdutoAgregadoAssembler;
 import com.gerenciamento.produtos.model.assembler.ProdutoAssembler;
+import com.gerenciamento.produtos.model.representation.ProdutoAgregadoRepresentationModel;
 import com.gerenciamento.produtos.model.representation.ProdutoRepresentationModel;
 import com.gerenciamento.produtos.openApiController.ProdutoControllerOpenApi;
 import com.gerenciamento.produtos.repository.ProdutoRepository;
+import com.gerenciamento.produtos.repository.projections.ProdutoAgregadoProjection;
 import com.gerenciamento.produtos.service.AuditoriaService;
 import com.gerenciamento.produtos.service.ProdutoService;
 import org.slf4j.Logger;
@@ -44,6 +47,9 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
     @Autowired
     private ProdutoAssembler produtoAssembler;
+
+    @Autowired
+    private ProdutoAgregadoAssembler agregadoAssembler;
 
     @Autowired
     private ProdutoService produtoService;
@@ -195,6 +201,18 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/valores-agregados")
+    public ResponseEntity<CollectionModel<ProdutoAgregadoRepresentationModel>> listarValoresAgregados() {
+        List<ProdutoAgregadoRepresentationModel> produtosAgregados = produtoRepository.buscarValoresAgregados().stream()
+                .map(ProdutoAgregadoProjection::toRepresentationModel)
+                .collect(Collectors.toList());
+
+        CollectionModel<ProdutoAgregadoRepresentationModel> response = CollectionModel.of(produtosAgregados);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     @GetMapping("/filtrar/por-multiplos-atributos")
     public ResponseEntity<CollectionModel<ProdutoRepresentationModel>> consultarPorMultiplosAtributos(

@@ -11,6 +11,7 @@ import com.gerenciamento.produtos.security.model.RefreshToken;
 import com.gerenciamento.produtos.security.provider.JwtTokenProvider;
 import com.gerenciamento.produtos.security.provider.RefreshTokenProvider;
 import com.gerenciamento.produtos.security.request.LoginRequest;
+import com.gerenciamento.produtos.security.request.SignupRequest;
 import com.gerenciamento.produtos.security.request.SignupSimpleRequest;
 import com.gerenciamento.produtos.security.request.TokenRefreshRequest;
 import com.gerenciamento.produtos.security.response.JwtResponse;
@@ -89,7 +90,7 @@ public class AutenticacaoController implements AutenticacaoControllerOpenApi {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> registrarUsuario(@Valid @RequestBody SignupSimpleRequest signUpRequest) {
+    public ResponseEntity<String> registrarUsuario(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByLogin(signUpRequest.getLogin())) {
             return ResponseEntity.badRequest().body("Error Usuário atual ja possui um refresh Token!");
         }
