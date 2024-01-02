@@ -34,6 +34,12 @@ public interface ProdutoRepositoryQuery {
                     "JOIN p.categoria c " +
                     "WHERE p.ativo = true";
 
+    public static String RELATORIO_CAMPOS_PRODUTOS =
+            "SELECT pr FROM Produto pr LEFT JOIN pr.categoria cat WHERE "
+                    + "(pr.id = :id OR :id IS NULL) "
+                    + "AND (UPPER(TRIM(pr.nome)) LIKE UPPER(TRIM(:nome)) OR :nome IS NULL) "
+                    + "AND (UPPER(TRIM(pr.sku)) LIKE UPPER(TRIM(:sku)) OR :sku IS NULL)";
+
     public static String EXISTE_PRODUTO_COM_SKU_DUPLICADO =
             "SELECT pr " +
                     "FROM Produto " +
@@ -60,7 +66,6 @@ public interface ProdutoRepositoryQuery {
     public static String CONSULTAR_PRODUTOS_INATIVOS =
             "SELECT pr FROM Produto pr " +
                     "WHERE ativo = false";
-
 
 
 }
