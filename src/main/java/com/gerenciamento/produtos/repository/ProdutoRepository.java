@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public interface ProdutoRepository extends JpaRepository<Produto,Long>, ProdutoR
     @Query(value = ProdutoRepositoryQuery.FILTRAR_POR_NOME_AND_CATEGORIA)
     List<Produto> filtrarProdutoPorNomeAndCategoria(String nome, String categoria_id);
 
-    @Query(ProdutoRepositoryQuery.FILTRAR_VALORES_AGREGADOS_PRODUTOS)
+    @Query(value = ProdutoRepositoryQuery.FILTRAR_VALORES_AGREGADOS_PRODUTOS)
     List<ProdutoAgregadoProjection> buscarValoresAgregados();
 
     @Query(value = ProdutoRepositoryQuery.FILTRAR_POR_NOME_AND_CATEGORIA)
@@ -45,5 +47,9 @@ public interface ProdutoRepository extends JpaRepository<Produto,Long>, ProdutoR
 
     @Query(value = ProdutoRepositoryQuery.CONSULTAR_PRODUTOS_ATIVOS)
     Page<Produto> buscarProdutosAtivos(Pageable pageable);
+
+    @Query(value = ProdutoRepositoryQuery.RELATORIO_CAMPOS_PRODUTOS)
+    List<Produto> consultarCamposProduto(@Param("id") Long id, @Param("nome") String nome, @Param("sku") String sku);
+
 
 }
