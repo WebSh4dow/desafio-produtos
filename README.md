@@ -29,7 +29,6 @@ A categoria contém os seguintes dados:
 Realizar as operações básicas de criação, leitura, atualização e exclusão de produtos.
 
 
-
 1. Deve ser possível realizar as operações CRUD em um produto (Os cadastros de categoria e usuário podem ser feitas diretamente no banco, sem necessidade de CRUD específico). - ☑
 
 2. O usuário pode inativar um produto ou excluir permanentemente. - ☑
@@ -63,8 +62,7 @@ Realizar as operações básicas de criação, leitura, atualização e exclusã
 - O sistema deve permitir que o administrador crie uma regra para quais campos não serão exibidos para o estoquista. Exemplo: o administrador não quer exibir ICMS e Custo. O administrador pode alterar essa regra para os campos exibidos a qualquer momento. - ☑
 
 - OBS:
-- para a ultima regra da visibilidade de campos para o estoquista, foi realizado uma implementação para ofuscar o valor dos respectivos campos então quando o estoquista tentar acessar ou atualizar não será possivel atualizar esses campos que ele
-- não possui a devida permissão de visibilidade os valores serão marcados como zerado por questões de implementação e devido ao tempo / viabilidade do desafio foi implementado dessa forma para evitar possiveis problemas de null e etc 
+- para a ultima regra da visibilidade de campos para o estoquista, foi realizado uma implementação para ofuscar o valor dos respectivos campos então quando o estoquista tentar acessar ou atualizar não será possivel atualizar esses campos o usuário do tipo estoquista que não possuia a devida permissão de visibilidade, os valores serão marcados como zerado por questões de implementação e devido ao tempo / viabilidade do desafio. Então foi implementado dessa forma para evitar possiveis problemas de null e etc. 
 
 7. Swagger da API. - ☑
 
