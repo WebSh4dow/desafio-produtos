@@ -62,9 +62,11 @@ Realizar as operações básicas de criação, leitura, atualização e exclusã
 
 - O sistema deve permitir que o administrador crie uma regra para quais campos não serão exibidos para o estoquista. Exemplo: o administrador não quer exibir ICMS e Custo. O administrador pode alterar essa regra para os campos exibidos a qualquer momento. - ☑
 
+- OBS:
+- para a ultima regra da visibilidade de campos para o estoquista, foi realizado uma implementação para ofuscar o valor dos respectivos campos então quando o estoquista tentar acessar ou atualizar não será possivel atualizar esses campos que ele
+- não possui a devida permissão de visibilidade os valores serão marcados como zerado por questões de implementação e devido ao tempo / viabilidade do desafio foi implementado dessa forma para evitar possiveis problemas de null e etc 
+
 7. Swagger da API. - ☑
-
-
 
 ### Resource de Produtos
 
@@ -434,21 +436,10 @@ PATCH  /api/produto/editar-campos/1
 ```
 
 
-**Exemplo de Requisição de remoção do produto usando (GET):**
-```json
-
-PATCH  /api/produto/editar-campos/1
-{
-    "ativo": false
-}
-
-```
-
 ### Resource de Autenticação:
 
-- Obs: Para facilitar ja existe um exemplo de autenticação no swagger implementado basta apenas fazer a requisição com o exemplo ja pronto, caso tenha registrado o acesso previamente via sql basta usar o exemplo dentro do swagger e copiar o token de autorização,
--  para o postman ou apenas autenticar no botão de autenticação informando o prefixo Bearer <token> facilitando ainda mais a autenticação, pois foi criado um endpoint para criação deste usuário bem como seu respectivo token, refresh token e etc.
-
+- Obs: Para facilitar ja existe um exemplo de autenticação no swagger implementado basta fazer a requisição com o exemplo já pronto, caso tenha registrado o acesso previamente via sql basta usar o exemplo dentro do swagger e copiar o token de autorização,
+para o postman ou apenas autenticar no botão de autenticação informando o prefixo Bearer <token> facilitando ainda mais a autenticação, pois foi criado um endpoint para criação deste usuário bem como seu respectivo token, refresh token e etc.
 
 
 **Exemplo de Requisição de signup (POST):**
