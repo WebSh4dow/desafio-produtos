@@ -46,7 +46,7 @@ Realizar as operações básicas de criação, leitura, atualização e exclusã
 
 8. O sistema deve emitir um relatório dos produtos em formato CSV ou XLSX (o usuário deve escolher qual formato), podendo filtrar os dados da mesma forma que os itens 4 e 5. O usuário, no momento da geração do relatório, poderá escolher quais campos do produto deseja exibir no relatório. Exemplo: todos, apenas ID e nome e SKU e etc. - [x]
 
-9. O sistema deve registrar auditoria de todos os eventos realizados (criação, atualização, exclusão e etc.), registrando as seguintes informações: objeto alterado, ação realizada (inclusão, alteração, exclusão), data/hora e usuário que realizou a alteração. Deve ser possível detalhar a auditoria, mostrando o campo alterado, valor anterior e valor atual. Exemplo: Auditoria: ID 39 - Produto - Inclusão - 10/10/2023 12:25 - Jose Carlos ID 40 - Produto - Alteração - 10/10/2023 12:30 - João da Silva Detalhamento auditoria ID 40: Campo: Nome - Valor anterior: Caixa SP - Valor atual: Caixa GR SP - [x]
+9. O sistema deve registrar auditoria de todos os eventos realizados (criação, atualização, exclusão e etc.), registrando as seguintes informações: objeto alterado, ação realizada (inclusão, alteração, exclusão), data/hora e usuário que realizou a alteração. Deve ser possível detalhar a auditoria, mostrando o campo alterado, valor anterior e valor atual. Exemplo: Auditoria: ID 39 - Produto - Inclusão - 10/10/2023 12:25 - Jose Carlos ID 40 - Produto - Alteração - 10/10/2023 12:30 - João da Silva Detalhamento auditoria ID 40: Campo: Nome - Valor anterior: Caixa SP - Valor atual: Caixa GR SP - ☑
 
 10. O usuário estoquista, na atualização de um produto, não deve alterar o Valor de Custo e ICMS. - [x]
 
