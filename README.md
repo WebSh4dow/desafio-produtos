@@ -1,4 +1,4 @@
-# Documentação da API de Gerenciamento de Produtos
+# API de Gerenciamento de Produtos
 
 ## Estrutura do Produto
 
