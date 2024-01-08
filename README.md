@@ -1,4 +1,4 @@
-# API de Gerenciamento de Produtos
+# API de Gerenciamento de Produtos [Desafio Tecnico]
 
 ## Estrutura do Produto
 
