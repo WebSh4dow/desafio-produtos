@@ -114,8 +114,8 @@ public class ProdutoService {
     }
 
     public Produto buscarPor(Long produtoId) {
-        Produto restaurante = produtoRepository.findById(produtoId).get();
-        return restaurante;
+        Produto produto = produtoRepository.findById(produtoId).get();
+        return produto;
     }
 
     public void remover(Produto produto) {
